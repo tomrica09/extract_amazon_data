@@ -19,7 +19,7 @@ The `bonus_analysis` folder contains Python scripts for various analytical tasks
 
 #### **a. Anomaly Detection**
 File: `anomaly_detection.py`
-- Identifies unusual spikes or drops in key metrics such as `Net sales`, `Units sold`, `Units returned`, and `Referral fee total`.
+- Identifies unusual spikes or drops in key metrics such as `Net sales`, `Units sold`, and `Units returned`.
 - Detects negative or missing values in critical fields (e.g., `Net sales`, `Units sold`).
 - Includes time-series visualizations to highlight anomalies.
 
@@ -93,12 +93,3 @@ Each script will display a detailed analysis with printed DataFrames and visuali
 │   └── profitability_analysis.py# Script for profitability analysis
 ├── README.md                   # Project documentation
 ```
-
-## **Future Improvements**
-- Add automated testing for data consistency and validation.
-- Expand analyses to include more advanced statistical or machine learning techniques.
-- Develop a dashboard for interactive visualizations.
-
-## **Contact**
-For questions or suggestions, please reach out to the project maintainer.
-
