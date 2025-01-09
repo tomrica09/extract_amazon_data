@@ -1,13 +1,19 @@
-import json
-import pandas as pd
-import numpy as np
-from fuzzywuzzy import process
+import json # Parsed JSON data from the file and handle any potential JSON decoding issues.
+import pandas as pd # Creating and manipulating structured data in the form of DataFrames to simplify data analysis.
+import numpy as np # Handling missing values by assigning NaN to unspecifided columns.
+from fuzzywuzzy import process # Fuzzy matching between raw keys and target column names, enabling approximate string matching.
 
 # Load and Parse the File
 def load_data(file_path):
     """
-    Reads the data from the file and parses it line by line.
-    Assumes each line is a JSON object.
+    Reads the data from the specified file and parses it line by line.
+    Assumes each line in the file is a valid JSON object.
+
+    Parameters:
+        file_path (str): Path to the file containing JSON data.
+
+    Returns:
+        list: A list of parsed JSON objects.
     """
     data = []
     with open(file_path, 'r') as file:
@@ -44,7 +50,7 @@ field_mapping = {
     "netProceeds.total.amount": "Net proceeds total",
 }
 
-# Target columns
+# Target columns for the DataFrame
 target_columns = [
     "Amazon store", "Start date", "End date", "Parent ASIN", "ASIN",
     "FNSKU", "MSKU", "Currency code", "Average sales price", "Units sold",
@@ -66,11 +72,33 @@ target_columns = [
 
 # Fuzzy matching for inexact matches
 def fuzzy_map_key(raw_key, target_columns, threshold=80):
+    """
+    Maps a raw key to the closest target column using fuzzy string matching.
+
+    Parameters:
+        raw_key (str): The raw key to match.
+        target_columns (list): List of target column names.
+        threshold (int): Minimum match score to consider a match (default is 80).
+
+    Returns:
+        str or None: The best match if the score exceeds the threshold, otherwise None.
+    """
     best_match, score = process.extractOne(raw_key, target_columns)
     return best_match if score >= threshold else None
 
 # Flatten nested JSON dynamically
 def flatten_json(json_obj, parent_key='', sep='.'):
+    """
+    Flattens a nested JSON object into a single-level dictionary.
+
+    Parameters:
+        json_obj (dict): The JSON object to flatten.
+        parent_key (str): Prefix for the keys (used for recursion).
+        sep (str): Separator to use for flattened keys (default is '.').
+
+    Returns:
+        dict: A flattened dictionary.
+    """
     items = []
     for key, value in json_obj.items():
         new_key = f"{parent_key}{sep}{key}" if parent_key else key
@@ -84,7 +112,13 @@ def flatten_json(json_obj, parent_key='', sep='.'):
 def map_to_dataframe(raw_data):
     """
     Maps raw JSON data to a structured DataFrame format with specified columns.
-    Missing values are filled with NaN.
+    Handles both exact and fuzzy mapping of fields.
+
+    Parameters:
+        raw_data (list): List of raw JSON objects.
+
+    Returns:
+        pd.DataFrame: A DataFrame with cleaned and structured data.
     """
     processed_data = []
     for record in raw_data:
@@ -112,10 +146,17 @@ def map_to_dataframe(raw_data):
     df = pd.DataFrame(processed_data, columns=target_columns)
     return df
 
-# Bonus Analysis
+# Simple Analysis
 def analyze_data(df):
     """
-    Perform basic analysis to identify patterns or insights.
+    Perform basic analysis on the cleaned data to identify patterns or insights.
+
+    Parameters:
+        df (pd.DataFrame): The cleaned DataFrame.
+
+    Examples:
+        - Summarizes sales by Amazon store.
+        - Identifies the top 5 products by net sales.
     """
     # Example: Summarize sales by Amazon store
     summary = df.groupby("Amazon store")["Net sales"].sum()
@@ -129,7 +170,16 @@ def analyze_data(df):
 
 # Main Execution
 def main():
-    file_path = "dummydata.txt" 
+    """
+    Main function to load data, process it, and perform analysis.
+
+    Steps:
+        1. Load raw JSON data from the file.
+        2. Map the data to a structured DataFrame.
+        3. Display and save the cleaned DataFrame.
+        4. Perform basic data analysis.
+    """
+    file_path = "dummydata.txt"  # Path to the input file
 
     print("Loading data...")
     raw_data = load_data(file_path)
